@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The Invisible Shift</title>
+<style>
+:root{--bg:#0b0a0f;--ink:#efe9e4;--mute:#9b929a;--red:#d1413a;--amb:#e3a85b;--card:#16141b;--line:#2a2630;color-scheme:dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:light){:root:not([data-theme="dark"]){--bg:#f4eee7;--ink:#1d1819;--mute:#6c6267;--red:#b3262a;--amb:#a8661c;--card:#fffaf4;--line:#ded3c8;color-scheme:light}}
+html{scroll-padding-top:env(safe-area-inset-top,0px);scroll-behavior:smooth}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--bg);z-index:10}
+body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:5;background:radial-gradient(ellipse at center,transparent 55%,rgba(0,0,0,.45));opacity:.7}
+.hud{position:fixed;top:0;left:0;right:0;z-index:11;padding:calc(env(safe-area-inset-top,0px) + 8px) 16px 4px;background:linear-gradient(var(--bg) 70%,transparent)}
+.row{display:flex;align-items:center;gap:14px;flex-wrap:wrap;justify-content:space-between}
+#clock{font:700 28px ui-monospace,Menlo,monospace;letter-spacing:.04em}
+.cnt{display:flex;gap:16px;font:11px ui-monospace,monospace;color:var(--mute);text-transform:uppercase;letter-spacing:.08em}
+.cnt b{display:block;color:var(--ink);font-size:16px}
+button{font:inherit;color:inherit;cursor:pointer}
+#cv{border:1px solid var(--line);background:none;border-radius:99px;padding:5px 12px;font-size:12px}
+body.cv #cv{background:var(--ink);color:var(--bg)}
+.ecgw{position:relative;height:46px;margin-top:2px}
+#ecg{width:100%;height:100%;display:block}
+.lbl{position:absolute;left:0;top:0;bottom:0;display:flex;flex-direction:column;justify-content:space-between;font:10px ui-monospace,monospace;color:var(--mute);text-transform:uppercase;padding:1px 0 0}
+main{transition:filter 1.2s}
+body.cv main{filter:grayscale(1) brightness(1.05)}
+.scene{min-height:100svh;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;padding:170px 7vw 70px;position:relative;overflow:hidden}
+.big{position:absolute;right:3vw;top:52%;transform:translateY(-50%);font:700 24vw/1 ui-monospace,monospace;color:transparent;-webkit-text-stroke:1px var(--line);pointer-events:none;user-select:none}
+.k{font:12px ui-monospace,monospace;letter-spacing:.25em;color:var(--red);text-transform:uppercase;margin-bottom:18px}
+.lead{font:400 clamp(22px,3.6vw,40px)/1.35 Georgia,"Times New Roman",serif;max-width:22em;margin:0 0 28px;position:relative}
+.sub{color:var(--mute);max-width:34em;margin:0 0 28px;position:relative}
+h1{font:400 clamp(44px,9vw,110px)/1 Georgia,serif;margin:0 0 20px;letter-spacing:-.02em;position:relative}
+.rv{opacity:0;transform:translateY(26px);filter:blur(8px);transition:opacity 1s,transform 1s,filter 1s}
+.in .rv{opacity:1;transform:none;filter:none}
+.in .rv:nth-child(3){transition-delay:.25s}.in .rv:nth-child(4){transition-delay:.5s}
+.door{position:relative;background:none;border:1px solid var(--red);border-radius:99px;padding:11px 22px;font:13px ui-monospace,monospace;letter-spacing:.08em;text-transform:uppercase;transition:background .3s,color .3s}
+.door:hover,.door:focus-visible{background:var(--red);color:#fff;outline:none}
+.panel{position:fixed;inset:0;z-index:50;background:var(--bg);overflow:auto;padding:calc(env(safe-area-inset-top,0px) + 70px) 7vw 90px;clip-path:circle(0 at var(--cx,50%) var(--cy,50%));visibility:hidden;transition:clip-path .9s cubic-bezier(.7,0,.2,1),visibility 0s .9s}
+.panel.on{clip-path:circle(160vmax at var(--cx,50%) var(--cy,50%));visibility:visible;transition:clip-path .9s cubic-bezier(.7,0,.2,1),visibility 0s}
+.pi{max-width:860px;margin:0 auto}
+.pi h2{font:400 clamp(30px,5vw,54px)/1.1 Georgia,serif;margin:0 0 14px}
+.pi p{margin:0 0 14px;max-width:38em}
+.x{position:fixed;top:calc(env(safe-area-inset-top,0px) + 12px);right:16px;z-index:60;border:1px solid var(--line);background:var(--bg);border-radius:99px;padding:6px 14px;font-size:13px}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin:18px 0}
+.tabs button{border:1px solid var(--line);background:none;border-radius:99px;padding:7px 16px;font-size:14px}
+.tabs button.a{background:var(--red);border-color:var(--red);color:#fff}
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px;margin:16px 0}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px}
+.card h3{margin:0 0 8px;font:12px ui-monospace,monospace;letter-spacing:.15em;text-transform:uppercase;color:var(--amb)}
+.card ul{margin:0;padding-left:18px}.card li{margin-bottom:6px}
+.why{border-left:3px solid var(--red);padding:2px 0 2px 14px;color:var(--mute);margin-top:18px}
+.pane[hidden]{display:none}
+footer{padding:80px 7vw 110px;color:var(--mute);font-size:13px;max-width:60em}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}.rv{opacity:1;transform:none;filter:none}}
+</style></head><body>
+<div class="hud">
+ <div class="row"><div id="clock">07:30</div>
+  <div class="cnt"><div>Painkillers<b id="pl">1</b></div><div>Hours on the clock<b id="hr">0.0</b></div><div>Plans cancelled<b>0</b></div></div>
+  <button id="cv" aria-pressed="false">Colleague view</button></div>
+ <div class="ecgw"><canvas id="ecg"></canvas><div class="lbl"><span>felt</span><span>seen</span></div></div>
+</div>
+<main>
+<section class="scene" data-h="7.5" data-p="1">
+ <div class="big">24h</div>
+ <div class="k rv">A documentary in 24 hours · Astana → Rio → Paris → Madrid</div>
+ <h1 class="rv">The Invisible Shift</h1>
+ <p class="sub rv">What it costs to keep going. Scroll — the day starts at 07:30. The line above is what I feel. The flat one is what everyone sees.</p>
+</section>
+<section class="scene" data-h="7.5" data-p="1">
+ <div class="big">07:30</div>
+ <div class="k rv">Monday, 28 September</div>
+ <p class="lead rv" data-alt="A person leaves home on time. Nothing to see.">The first task of the day was not work. It was getting out of bed. Pain: “100 out of 10.” One tablet, and work starts at eight.</p>
+ <button class="door rv" data-d="types">Two kinds of pain ↳</button>
+</section>
+<section class="scene" data-h="8" data-p=".85">
+ <div class="big">08:00</div>
+ <div class="k rv">Nobody noticed</div>
+ <p class="lead rv" data-alt="A person at a desk. Present. Productive. Nothing visible.">In a Dutch study of 32,748 women, 80.7% worked less effectively while present, and only 13.8% ever stayed away. The cost is not an empty desk. It is a full desk.</p>
+ <button class="door rv" data-d="normal">Is this normal? ↳</button>
+</section>
+<section class="scene" data-h="12" data-p=".6">
+ <div class="big">12:00</div>
+ <div class="k rv">The rule</div>
+ <p class="lead rv" data-alt="Lunch break. An ordinary day.">“I cannot let people or myself down.” Nobody told me that. But I did not invent it alone.</p>
+ <button class="door rv" data-d="athletes">Rio 2016 · Paris 2022 ↳</button>
+</section>
+<section class="scene" data-h="14" data-p=".9">
+ <div class="big">14:00</div>
+ <div class="k rv">Second dose</div>
+ <p class="lead rv" data-alt="A student in a lecture hall. Taking notes.">Classes until six. More pain relief. The morning tablet was not the end of anything. What if it is not just “a bad period”?</p>
+ <button class="door rv" data-d="map">What could be behind it ↳</button>
+</section>
+<section class="scene" data-h="18" data-p=".5">
+ <div class="big">18:00</div>
+ <div class="k rv">The law nobody uses</div>
+ <p class="lead rv" data-alt="Policy exists. Nobody mentions it.">Japan has had menstrual leave since 1947. Spain since 2023 — used 1,559 times in eleven months. The right exists. Silence still wins.</p>
+</section>
+<section class="scene" data-h="20" data-p=".7">
+ <div class="big">20:00</div>
+ <div class="k rv">The gym</div>
+ <p class="lead rv" data-alt="A person at the gym. Normal pace.">“Lower the load, don’t cancel.” My trainer says it out loud. I had been doing it in silence.</p>
+ <button class="door rv" data-d="palvin">Barbara Palvin ↳</button>
+</section>
+<section class="scene" data-h="23" data-p=".4">
+ <div class="big">23:00</div>
+ <div class="k rv">Perfect attendance</div>
+ <p class="lead rv" data-alt="The day ends. Perfect attendance.">Perhaps the second shift is not the pain. It is the work of hiding it. And one day the periods stop. Does the shift?</p>
+ <button class="door rv" data-d="meno">Is menopause the end? ↳</button>
+</section>
+</main>
+<footer>Medical information here gives context for readers and is not a diagnosis. Sources: WHO endometriosis fact sheet; NHS period pain; Schoep et al., BMJ Open 2019; interview MED-01. Scenes of the author’s day are reconstructed from her diary. This website was created with the help of Claude, an AI assistant by Anthropic.</footer>
+
+<button class="x" id="xx" hidden>Back to the clock ✕</button>
+
+<div class="panel" id="types"><div class="pi"><div class="k">07:30 · Door</div><h2>Two kinds of period pain</h2>
+ <p>“Dysmenorrhoea” is the medical word for painful periods. Doctors split it in two — and the split decides what happens next.</p>
+ <div class="tabs"><button class="a" data-t="t1">Primary</button><button data-t="t2">Secondary</button></div>
+ <div class="pane" id="t1"><div class="card"><h3>No underlying disease</h3><p>Cramps come from prostaglandins, substances that make the uterus contract. It usually begins within a year or so of the first period, lasts a couple of days, and often eases with age. Heat, movement and anti-inflammatory painkillers are the usual tools.</p></div></div>
+ <div class="pane" id="t2" hidden><div class="card"><h3>A condition is causing it</h3><p>Endometriosis, adenomyosis, fibroids or pelvic infection can sit behind the pain. It more often appears in the 30s and 40s, and the two types can overlap. Clues: pain that starts days before bleeding, lasts longer, grows worse over time or continues after the period; pain during sex; bleeding between periods; very heavy bleeding.</p></div></div>
+ <p class="why">Why it matters: roughly one woman in five has pain strong enough to disrupt daily life. Painkillers can quiet the signal while the cause stays untreated.</p></div></div>
+
+<div class="panel" id="normal"><div class="pi"><div class="k">08:00 · Door</div><h2>Is painful normal?</h2>
+ <p>Some cramping is normal: the uterus contracts to shed its lining. But common is not the same as normal — pain that stops you studying, working or moving is not something you are supposed to simply endure.</p>
+ <div class="cols">
+  <div class="card"><h3>See a doctor if</h3><ul><li>pain stops you doing normal things</li><li>it is getting worse, or lasts longer than before</li><li>bleeding is very heavy, with tiredness or dizziness</li><li>pain during sex, or bleeding between periods</li><li>your usual painkiller stops working</li></ul></div>
+  <div class="card"><h3>What it can lead to</h3><ul><li>iron-deficiency anaemia from heavy bleeding</li><li>years of delay before a diagnosis (7–10 years is often cited for endometriosis)</li><li>trouble conceiving in some conditions</li><li>chronic pain, fatigue, lost study and work — the “full desk” loss</li></ul></div></div>
+ <p class="why">The Dutch data says most women show up anyway. That is exactly why nobody sees it.</p></div></div>
+
+<div class="panel" id="athletes"><div class="pi"><div class="k">12:00 · Door</div><h2>Rio 2016 · Paris 2022</h2>
+ <div class="cols"><div class="card"><h3>Fu Yuanhui, swimmer</h3><p>After the relay she explained that her period had started the day before and left her very tired — then said it was not an excuse. Millions praised her for saying the word. Fewer noticed the apology.</p></div>
+ <div class="card"><h3>Zheng Qinwen, tennis</h3><p>At Roland-Garros she said the first day of her period hurt more than her leg injury, and wished she could be a man on court. Not envy — a world built around a body without this variable.</p></div></div>
+ <p class="why">Two elite athletes, two continents, one sentence: the pain is real, but it must not count.</p></div></div>
+
+<div class="panel" id="map"><div class="pi"><div class="k">14:00 · Door</div><h2>What could be behind the pain</h2>
+ <p>Three conditions share symptoms and are easily confused — so diagnosis matters, because treatment differs.</p>
+ <div class="tabs"><button class="a" data-t="c1">Endometriosis</button><button data-t="c2">Adenomyosis</button><button data-t="c3">Fibroids</button></div>
+ <div class="pane" id="c1"><div class="card"><h3>Tissue outside the womb</h3><p>Tissue like the womb lining grows in the pelvis, on the ovaries or the bowel. Pain may start before and continue after bleeding, and can come with pain during sex or bowel movements. It can affect fertility. WHO: about 10% of women of reproductive age, around 190 million. Confirming it often needs imaging and sometimes keyhole surgery (laparoscopy).</p></div></div>
+ <div class="pane" id="c2" hidden><div class="card"><h3>Tissue inside the muscle wall</h3><p>The same kind of tissue grows into the uterine muscle. The uterus can enlarge and feel tender; periods are heavy and long, cramps severe. Usually found with ultrasound or MRI. It can exist together with endometriosis.</p></div></div>
+ <div class="pane" id="c3" hidden><div class="card"><h3>Benign lumps in the muscle</h3><p>Non-cancerous growths. Many people have none of the symptoms; others get heavy or irregular bleeding and a feeling of pressure or fullness. The uterus can feel lumpy rather than evenly enlarged.</p></div></div>
+ <p class="why">Where the tissue sits is the difference. It decides the scan, the treatment and the questions to ask a doctor.</p></div></div>
+
+<div class="panel" id="palvin"><div class="pi"><div class="k">20:00 · Door</div><h2>Barbara Palvin</h2>
+ <p>The model has spoken publicly about living with endometriosis. After surgery in 2025 she said the difference was “like day and night” — while stressing the disease is still under-researched and that surgery is not a cure. She also credited her husband, Dylan Sprouse, for supporting her recovery.</p>
+ <div class="cols"><div class="card"><h3>What her story shows</h3><p>Visibility and resources do not remove the long road: diagnosis, surgery, then ongoing management. We rely only on what she said publicly, and do not speculate beyond it.</p></div>
+ <div class="card"><h3>What the doctor adds</h3><p>“Not ‘endure’, but ‘find out and get treated’.” — MED-01, gynaecologist</p></div></div></div></div>
+
+<div class="panel" id="meno"><div class="pi"><div class="k">23:00 · Door</div><h2>Is menopause the end?</h2>
+ <p>The last period is not a finish line. It is the point where a long hormonal change becomes visible.</p>
+ <div class="tabs"><button class="a" data-t="m1">Before</button><button data-t="m2">The last period</button><button data-t="m3">After</button></div>
+ <div class="pane" id="m1"><div class="card"><h3>Perimenopause</h3><p>Often starts in the 40s and can last years. Estrogen rises and falls unpredictably: irregular cycles, hot flushes, poor sleep, mood changes. Periods may get heavier or more erratic before they stop.</p></div></div>
+ <div class="pane" id="m2" hidden><div class="card"><h3>Menopause</h3><p>Defined looking back: twelve months without a period. The average age is about 51. Earlier menopause means a longer time without estrogen.</p></div></div>
+ <div class="pane" id="m3" hidden><div class="card"><h3>Postmenopause</h3><p>Low estrogen speeds up bone loss, fastest in roughly the first ten years after the last period. Cardiovascular risk rises. Vaginal dryness and painful sex may persist or worsen. And any bleeding after menopause should be checked by a doctor.</p></div></div>
+ <p class="why">Periods end. The hormonal story does not. The shift does not disappear — it changes name, and the silence around it often continues.</p></div></div>
+
+<script>
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const S=$$('.scene'),fmt=h=>String(Math.floor(h)).padStart(2,'0')+':'+String(Math.floor((h%1)*60)).padStart(2,'0');
+let cv=false,P=1,A=1;
+$$('.lead').forEach(l=>l.dataset.o=l.innerHTML);
+function tick(){
+ const y=scrollY+innerHeight*.5;let i=0;
+ S.forEach((s,k)=>{if(s.offsetTop<=y)i=k});
+ const a=S[i],b=S[i+1],h0=+a.dataset.h,p0=+a.dataset.p;let h=h0,p=p0;
+ if(b){const f=Math.min(1,Math.max(0,(y-a.offsetTop)/(b.offsetTop-a.offsetTop)));h=h0+f*(+b.dataset.h-h0);p=p0+f*(+b.dataset.p-p0)}
+ P=p;$('#clock').textContent=fmt(h);$('#hr').textContent=(h-7.5).toFixed(1);$('#pl').textContent=h>=14?'2+':'1';
+}
+addEventListener('scroll',tick,{passive:true});addEventListener('resize',tick);tick();
+const io=new IntersectionObserver(es=>es.forEach(e=>e.target.classList.toggle('in',e.isIntersecting)),{threshold:.35});
+S.forEach(s=>io.observe(s));
+$('#cv').onclick=()=>{cv=!cv;document.body.classList.toggle('cv',cv);$('#cv').setAttribute('aria-pressed',cv);$$('.lead').forEach(l=>l.innerHTML=cv?l.dataset.alt:l.dataset.o)};
+let cur=null;
+function close(){if(cur){cur.classList.remove('on');cur=null;$('#xx').hidden=true;document.body.style.overflow=''}}
+$$('.door').forEach(d=>d.onclick=e=>{const p=$('#'+d.dataset.d);p.style.setProperty('--cx',e.clientX+'px');p.style.setProperty('--cy',e.clientY+'px');p.scrollTop=0;p.classList.add('on');cur=p;$('#xx').hidden=false;document.body.style.overflow='hidden'});
+$('#xx').onclick=close;addEventListener('keydown',e=>{if(e.key==='Escape')close()});
+$$('.tabs button').forEach(b=>b.onclick=()=>{const p=b.closest('.panel');p.querySelectorAll('.tabs button').forEach(x=>x.classList.toggle('a',x===b));p.querySelectorAll('.pane').forEach(x=>x.hidden=x.id!==b.dataset.t)});
+const c=$('#ecg'),g=c.getContext('2d');let W,H,hist=[],ph=0;
+function rs(){const d=devicePixelRatio||1;W=c.width=c.clientWidth*d;H=c.height=c.clientHeight*d;hist=new Array(Math.ceil(W/3)).fill(0)}
+rs();addEventListener('resize',rs);
+function loop(){
+ A+=((cv?.03:P)-A)*.04;ph++;const q=ph%46,sp=q<5?Math.sin(q/5*Math.PI)*(ph%92<5?-1.3:.8):0;
+ hist.push(((Math.random()-.5)*.3+sp)*A);hist.shift();
+ const cs=getComputedStyle(document.documentElement),d=devicePixelRatio||1;
+ g.clearRect(0,0,W,H);g.lineWidth=2*d;g.strokeStyle=cs.getPropertyValue('--red');g.beginPath();
+ hist.forEach((v,i)=>{const y=H*.38-v*H*.42;i?g.lineTo(i*3,y):g.moveTo(0,y)});g.stroke();
+ g.strokeStyle=cs.getPropertyValue('--mute');g.lineWidth=d;g.beginPath();g.moveTo(0,H*.88);g.lineTo(W,H*.88);g.stroke();
+ requestAnimationFrame(loop)}
+if(!matchMedia('(prefers-reduced-motion:reduce)').matches)loop();
+</script>
+</body></html>
